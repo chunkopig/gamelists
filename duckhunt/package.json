@@ -39,7 +39,7 @@
     "hard-source-webpack-plugin": "^0.12.0",
     "howler": "^2.0.2",
     "json-loader": "^0.5.4",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.13",
     "node-object-hash": "^1.1.5",
     "pixi.js": "^4.3.4",
     "script-loader": "^0.7.0",
