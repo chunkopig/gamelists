@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<groups xmlns="stendhal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="stendhal groups.xsd ">
+	<group uri="creatures/angel.xml" />
+	<group uri="creatures/animal.xml" />
+	<group uri="creatures/beast.xml" />
+    <group uri="creatures/demon.xml" />
+    <group uri="creatures/dragon.xml" />
+	<group uri="creatures/dwarf.xml" />
+	<group uri="creatures/elemental.xml" />
+	<group uri="creatures/elf.xml" />
+	<group uri="creatures/giant.xml" />
+    <group uri="creatures/gnome.xml" />
+	<group uri="creatures/goblin.xml" />
+	<group uri="creatures/human.xml" />
+	<group uri="creatures/humanoid.xml" />
+	<group uri="creatures/hybrid.xml" />
+    <group uri="creatures/oni.xml" />
+    <group uri="creatures/orc.xml" />
+	<group uri="creatures/troll.xml" />
+	<group uri="creatures/undead.xml" />
+</groups>
