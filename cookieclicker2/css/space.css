@@ -1,0 +1,63 @@
+.row {
+	display: inline-flex;
+	margin-bottom: 16px;
+	width: 100%;
+}
+
+.row .shipName {
+	font-weight: bold;
+	color: #333333;
+}
+
+.row .price {
+	color: #999999;
+}
+
+.columnBuy {
+	text-align: center;
+}
+
+.columnCount {
+	text-align: center;
+}
+
+.triColumn {
+	width: 33%;
+}
+
+.spaceScroller {
+	margin-top: 16px;
+	height: 500px;
+	overflow: auto;
+	position: relative;
+	background-image: url('../images/space/background.jpg');
+	box-shadow: 0 0 10px;
+}
+
+.planet {
+	width: 64px;
+	height: 64px;
+	position: absolute;
+	text-align: center;
+}
+
+.planet.hover {
+	/* Add glow around planet or something here! */
+}
+
+.battleLogCloseButton {
+	float: right;
+	cursor: pointer;
+}
+
+.battleRow {
+	width: 50%;
+}
+
+.enemyAttack {
+	margin-left: 50%;
+}
+
+.white {
+	color: #FFFFFF;
+}

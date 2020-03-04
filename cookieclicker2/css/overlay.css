@@ -1,0 +1,104 @@
+.messageBottom {
+	position: fixed;
+	bottom: 0;
+	margin-bottom: 16px;
+	width: 100%;
+	text-align: center;
+
+	font-family: Arial;
+
+	font-weight: bold;
+	font-size: 24px;
+	color: #333333;
+
+	pointer-events: none;
+}
+
+.messageStart {
+	transition: all 4s ease;
+}
+
+.messageEnd {
+	padding-bottom: 32px;
+	color: rgba(153, 153, 153, 0);
+}
+
+.numberPop {
+	position: fixed;
+	font-size: 24px;
+	left: -500px;
+
+	cursor: pointer;
+	color: white;
+   	-webkit-text-stroke: 1px rgba(0,0,0,1);
+
+	pointer-events: none;
+}
+
+.tutorial {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+}
+
+.tutorial img {
+	vertical-align: top;
+}
+
+.tutorial div {
+	color: white;
+	width: 200px;
+	background-color: #333;
+	border-radius: 16px;
+	padding: 16px;
+	word-wrap: break-word;
+	display: inline-block;
+}
+
+#helpBalloon {
+	position: fixed;
+	right: 4px;
+	bottom: 81px;
+
+	width: 160px;
+
+	background-color: #FFFFCC;
+	border: 1px solid;
+	border-color: #010101;
+	border-radius: 8px;
+	padding: 16px;
+
+	font-size: 12px;
+}
+
+#helpClosed {
+	position: fixed;
+	right: 4px;
+	bottom: 4px;
+}
+
+.closeClippy {
+	float: right;
+	margin-top: -14px;
+	margin-right: -12px;
+}
+
+#clippyTip {
+	position: fixed;
+	right: 16px;
+	bottom: 74px;
+}
+
+#clippy {
+	position: fixed;
+	right: 8px;
+	bottom: 4px;
+}
+
+.helpLink {
+	cursor: pointer;
+}
+
+.helpLink:hover {
+	text-decoration: underline;
+}

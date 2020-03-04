@@ -1,0 +1,249 @@
+body  {
+	background-color: #FFFFFF;
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+.stats {
+	text-align: center;
+	width: 100%;
+}
+
+.logo {
+	float: left;
+	padding-top: 6px;
+}
+
+.links {
+	text-align: right;
+	line-height: 70px;
+	max-width: 900px;
+	font-size: 27px;
+}
+
+.links a { 
+	text-decoration: none;
+	text-transform: uppercase;
+	font-weight: bold;
+	padding: 0 5px; 
+}
+
+a {	transition: color .25s ease;}
+a:link {color: rgba(0, 0, 0, 1);}
+a:visited {color: rgba(0, 0, 0, 1);} 
+a:hover {color: rgba(0, 0, 0, .75);}
+a:active {color: rgba(0, 0, 0, .75);}
+
+.hero {
+	background-image: url('../images/skyscraper.jpg');
+	background-size: cover;
+	color: white;
+	font-weight: bold;
+}
+
+.heroContent {
+	background-color:rgba(0, 0, 0, 0.26);
+	padding: 16px;
+}
+
+.hero .money {
+	font-size: 72px;
+}
+
+.hero .companyName {
+	font-size: 27px;
+}
+
+.hero .info {
+	font-size: 18px;
+}
+
+.mainContent {
+	max-width: 932px;
+	margin-top: 16px;
+}
+
+.opportunity {
+	margin-top: 16px;
+	padding: 0px 16px;
+
+	min-width: 550px;
+	font-size: 32px;
+	color: black;
+	background-color: white;
+	line-height: 72px;
+	height: 72px;
+	display: inline-block;
+	border-radius: 16px;
+
+	overflow: hidden;
+}
+
+.opportunityHover {
+	cursor: pointer;
+}
+
+.noSelect {
+	/* Prevent double clicking the page or items or something from highlighting text */
+	-webkit-user-select: none; /* webkit (safari, chrome) browsers */
+	-moz-user-select: none; /* mozilla browsers */
+	-khtml-user-select: none; /* webkit (konqueror) browsers */
+	-ms-user-select: none; /* IE10+ */
+}
+
+.left {
+	float: left;
+}
+
+.right {
+	float: right;
+}
+
+.top {
+	width: 100%;
+	background-color: #FFFFFF;
+}
+
+.center {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.textCenter {
+	text-align: center;
+}
+
+h1 {
+	font-size: 36px;
+}
+
+h2 {
+	font-size: 24px;
+}
+
+h3 {
+	font-size: 16px;
+}
+
+.underline {
+	text-decoration: underline;
+}
+
+.bold {
+	font-family: Helvetica Bold, Arial Bold, sans-serif;
+}
+
+.content {
+	padding: 16px;
+	max-width: 600px;
+}
+
+.content section:not(:first-child) {
+	margin-top: 16px;
+}
+
+.leftAd {
+	position: absolute;
+	left: 0px;
+	bottom: 0px;
+	display: none;
+}
+
+.rightAd {
+	position: absolute;
+	right: 0px;
+	bottom: 0px;
+	display: none;
+}
+
+.bottomAd {
+	margin-top: 16px;
+	text-align: center;
+}
+
+@media screen and (min-width:875px) {
+	.rightAd, .leftAd {
+		display: block;
+	}
+}
+
+.updateText {
+	height: 0px;
+}
+
+li {
+	list-style-type: disc;
+	margin-left: 16px;
+}
+
+.bottomLinks {
+	position: fixed;
+	bottom: 4px;
+	left: 4px;
+}
+
+.bottomLinks a {
+	text-decoration: none;
+}
+
+/* Fake Buttons */
+.button {
+	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	box-shadow:inset 0px 1px 0px 0px #ffffff;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
+	background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf');
+	background-color:#ededed;
+	-webkit-border-top-left-radius:0px;
+	-moz-border-radius-topleft:0px;
+	border-top-left-radius:0px;
+	-webkit-border-top-right-radius:0px;
+	-moz-border-radius-topright:0px;
+	border-top-right-radius:0px;
+	-webkit-border-bottom-right-radius:0px;
+	-moz-border-radius-bottomright:0px;
+	border-bottom-right-radius:0px;
+	-webkit-border-bottom-left-radius:0px;
+	-moz-border-radius-bottomleft:0px;
+	border-bottom-left-radius:0px;
+	text-indent:0;
+	border:1px solid #dcdcdc;
+	display:inline-block;
+	color:#333333;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	font-style:normal;
+	height:30px;
+	line-height:30px;
+	width:150px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px 1px 0px #ffffff;
+	margin-top: 8px;
+
+	/* Prevent double clicking the page or items or something from highlighting text */
+	-webkit-user-select: none; /* webkit (safari, chrome) browsers */
+    -moz-user-select: none; /* mozilla browsers */
+    -khtml-user-select: none; /* webkit (konqueror) browsers */
+    -ms-user-select: none; /* IE10+ */
+}
+.button:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
+	background:-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed');
+	background-color:#dfdfdf;
+	cursor: pointer;
+}
+.button:active {
+	position:relative;
+	top:1px;
+}
+
+.button.small {
+	max-width: 40px;
+}
+
+.button.large {
+	width: 200px;
+}

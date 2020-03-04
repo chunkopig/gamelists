@@ -1,0 +1,667 @@
+<head>
+	<script src="scripts/angular.min.js"></script>
+	<script src="scripts/jquery-1.11.1.min.js"></script>
+	<script src="scripts/jquery-ui-1.10.4.min.js"></script>
+	<script src="scripts/angular-route.min.js"></script>
+	<script src="scripts/aes.js"></script>
+	<script src="scripts/idleGame.js"></script>
+	<script src="scripts/gameService.js"></script>
+	<script src="scripts/playerService.js"></script>
+	<script src="scripts/cacheService.js"></script>
+	<script src="scripts/knowledge.js"></script>
+	<script src="scripts/gameLoop.js"></script>
+	<script src="scripts/business.js"></script>
+	<script src="scripts/menu.js"></script>
+	<script src="scripts/stats.js"></script>
+	<script src="scripts/overlay.js"></script>
+	<script src="scripts/space.js"></script>
+	<script src="scripts/spaceStory.js"></script>
+	<script src="scripts/help.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/reset.css" />
+	<link rel="stylesheet" type="text/css" href="css/main.css" />
+	<link rel="stylesheet" type="text/css" href="css/store.css" />
+	<link rel="stylesheet" type="text/css" href="css/overlay.css" />
+	<link rel="stylesheet" type="text/css" href="css/space.css" />
+	<link rel="stylesheet" type="text/css" href="css/jquery-ui-1.10.4.min.css" />
+	<title>Giant Shaft Enterprises</title>
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-5427745-1', 'giantshaft.com');
+		ga('send', 'pageview');
+	</script>
+</head>
+<body>
+	<div ng-app="idleGame">
+		<div>
+
+			<div class="top">
+				<div class="stats" ng-controller="GameLoopController">
+					<div class="links center">
+						<img class="logo" src="images/logo.jpg" alt="logo" />
+						<a href="#/business">Business</a>
+						<a href="#/space" ng-show="showSpace()">Space</a>
+						<a href="#/knowledge" ng-show="showKnowledge()">Knowledge</a>
+						<a href="#/stats">Stats</a>
+						<a href="#/menu">Menu</a>
+					</div>
+
+					<div class="hero">
+						<div class="heroContent">
+							<p class="money">{{getMoney() | currency}}</p>
+							<p class="companyName">{{getCompanyName()}}</p>
+							<p class="info">Money/Second: {{getMps() | currency}}</p>
+							<p class="info">Money/Opportunity: {{getClickPower() | currency}}</p>
+							<p class="info" ng-show="getResourcesPerSecond() > 0">Resources/Second: {{getResourcesPerSecond()}}</p>
+							<div class="updateText"
+								 ng-show="loadedVersion < currentVersion">
+								<p>NEW VERSION - REFRESH TO GET IT</p>
+							</div>
+
+							<div ng-controller="BusinessController">
+								<div class="opportunity center noSelect"
+									 ng-class="{enabled: true, opportunityHover: hoverButton}"
+									 ng-init="generateOpportunities()"
+									 ng-click="doBusiness(opportunity, $event)"
+									 ng-mouseenter="hoverButton = true"
+									 ng-mouseleave="hoverButton = false">
+									<p>{{opportunity}}</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="leftAd">
+				<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+				<!-- Idle Game Right Side -->
+				<ins class="adsbygoogle"
+				     style="display:inline-block;width:120px;height:600px"
+				     data-ad-client="ca-pub-2046389339559087"
+				     data-ad-slot="2827205531"></ins>
+				<script>
+				(adsbygoogle = window.adsbygoogle || []).push({});
+				</script>
+			</div>
+
+			<div class="mainContent center">
+				<ng-view>Loading...</ng-view>
+				 
+				<script type="text/ng-template" id="business.html">
+
+					<div class="store">
+						<div class="item" 
+							 ng-class="{disabled: cantBuyStoreItem(item), enabled: !cantBuyStoreItem(item), hover: !cantBuyStoreItem(item) && hoverStore}" 
+							 ng-repeat="item in items track by $index" 
+							 ng-click="buyStoreItem($event, item)"
+							 ng-mouseenter="hoverStore = true"
+							 ng-mouseleave="hoverStore = false">
+							<p class="name">{{item.name}}</p>
+							<div class="bottom">
+								<span class="info">
+									<p>Adds: {{getMps(item) | currency}}</p>
+									<p>Cost: {{currentPrice(item) | currency}}</p>
+								</span>
+								<p class="count">{{getCount(item.id)}}</p>
+							</div>
+						</div>
+						<div class = "item">
+							<p class="name">Increment</p>
+							<p class="info">Buy this amount at once (0 buys max).</p>
+							<input type="text" ng-model="playerService.customIncrement" />
+						</div>
+					</div>
+
+					<div class="upgrade">
+						<div class="item"
+							 ng-class="{disabled: cantBuyUpgrade(upgrade), enabled: !cantBuyUpgrade(upgrade), hover: !cantBuyUpgrade(upgrade) && hoverUpgrade, alreadyBought: alreadyBought(upgrade.id)}" 
+							 ng-repeat="upgrade in upgrades track by $index"
+							 ng-click="buyUpgrade(upgrade)"
+							 ng-mouseenter="hoverUpgrade = true"
+							 ng-mouseleave="hoverUpgrade = false"
+							 ng-show="canShowUpgrade(upgrade)"
+							 ng-attr-title="{{upgrade.description}}">
+							<p class="name">{{upgrade.name}}</p>
+							<div class="bottom info">
+								<p>Cost: {{upgrade.price | currency}}</p>
+								<p ng-show="!upgrade.isBusiness">
+									Adds: {{upgrade.mps | currency}}
+								</p>
+								<p ng-show="upgrade.isOpportunity && upgrade.mpo">
+									Adds: {{upgrade.mpo | currency}}/Opportunity
+								</p>
+								<p ng-show="upgrade.isOpportunity && upgrade.mpop">
+									Adds: {{upgrade.mpop * 100}}% of MPS/Opportunity
+								</p>
+								<p ng-show="upgrade.isOnLoad">
+									Adds: {{upgrade.per * 100}}% of MPS
+								</p>
+								<p ng-show="upgrade.isAchievement">
+									Adds: {{upgrade.per * 100 | number:2}}%/Achievement
+								</p>
+								<p ng-show="upgrade.isBcBoost">
+									Increase: {{upgrade.bcBoost * 100 | number:2}}%
+								</p>
+								<p>For: <span class="underline">{{getItemName(upgrade.itemId)}}</span></p>
+							</div>
+						</div>
+					</div>
+
+					<div class="achievementsContainer"
+						 ng-init="updateCache()">
+						<div class="achievement"
+							 ng-attr-title="{{achievement.name}} - {{achievement.description}}"
+							 ng-repeat="achievement in cachedAchievements">
+							<img ng-src="images/achievements/{{achievement.image ? achievement.image : 'noImage'}}.png" />
+						</div>
+					</div>
+
+				</script>
+
+				<script type="text/ng-template" id="stats.html">
+					<div class="stats content center" ng-controller="StatsController">
+						<div class="item enabled">
+							<p class="name">Money</p>
+							<div class="info">
+								<p>This Company: {{playerService.totalMoney | currency}}</p>
+								<p ng-show="playerService.totalMoneyReset > 0">Previous: {{playerService.totalMoneyReset | currency}}</p>
+							</div>
+						</div>
+						<div class="item enabled">
+							<p class="name">Business Opportunties</p>
+							<div class="info">
+								<p>This Company: {{playerService.totalOpportunities}}</p>
+								<p ng-show="playerService.totalOpportunitiesReset > 0">Previous: {{playerService.totalOpportunitiesReset}}</p>
+								<p>Total Earned: {{playerService.totalMoneyFromOpportunties | currency}}</p>
+								<p>Current Per Opportunity: {{cacheService.clickPower() | currency}}</p>
+							</div>
+						</div>
+						<div class="item enabled">
+							<p class="name">Buildings Bought</p>
+							<p class="info">{{totalBuildings}}</p>
+						</div>
+						<div class="item enabled">
+							<p class="name">Upgrades Bought</p>
+							<p class="info">{{totalUpgrades}} / {{possibleUpgrades()}}</p>
+						</div>
+						<div class="item enabled">
+							<p class="name">Achievements Earned</p>
+							<p class="info">{{totalAchievements}} / {{possibleAchievements}}</p>
+						</div>
+						<div class="item enabled" ng-show="playerService.totalKnowledge > 0">
+							<p class="name">Business Knowledge</p>
+							<div class="info">
+								<p>Current: {{playerService.knowledge}}</p>
+								<p>Total: {{playerService.totalKnowledge}}</p>
+							</div>
+						</div>
+						<div class="item enabled" ng-show="playerService.vcFunding > 0">
+							<p class="name">VC Funding</p>
+							<div class="info">
+								<p>{{playerService.vcFunding * 1000 | currency}}</p>
+							</div>
+						</div>
+						<div class="item enabled" ng-show="playerService.businessConnections > 0">
+							<p class="name">Business Connections</p>
+							<div class="info">
+								<p>{{playerService.businessConnections | number}}</p>
+							</div>
+						</div>
+
+						<p>Achievements</p>
+
+						<div class="item"
+							 ng-repeat="achievement in achievements"
+							 ng-class="{enabled: hasEarned(achievement.id), disabled: !hasEarned(achievement.id)}">
+							<div ng-show="hasEarned(achievement.id) || !achievement.isHidden">
+								<p class="name">{{achievement.name}}</p>
+								<p class="info">{{achievement.description}}</p>
+							</div>
+							<div ng-show="!hasEarned(achievement.id) && achievement.isHidden">
+								<p class="name">???</p>
+							</div>
+						</div>
+					</div>
+				</script>
+
+				<script type="text/ng-template" id="space.html">
+					<div class="content center">
+						<div class="item">
+							<div ng-show="playerService.hideResources">
+								<a class="battleLogCloseButton" ng-click="playerService.hideResources = false">+</a>
+								<p class="name">Resources</p>
+							</div>
+							<div ng-show="!playerService.hideResources">
+								<a class="battleLogCloseButton" ng-click="playerService.hideResources = true">-</a>
+							</div>
+							
+							<div ng-show="!playerService.hideResources">
+
+								<div ng-show="playerService.resources.length > 0">
+									<p class="name">Resources</p>
+									<div ng-show="miningRate() > 0">
+										Mining: {{miningRate()}}/sec
+										<br /><br />
+									</div>
+									<p ng-repeat="resource in playerService.resources" ng-show="resource.count > 0">{{getName(resource.id)}} - {{resource.count | number}}</p>
+								</div>
+
+								<br /><br />
+								
+								<p class="name">Shaft Mining</p>
+								<a class="button" ng-show="current == null" ng-click="scanForAsteroid()">Scan For Asteroid</a>
+								<div class="asteroid" ng-show="current != null">
+									<p>Mining Cost - {{current.miningCost | currency}}</p>
+									<p>Chance - {{current.chance | number:0}}%</p>
+									<div ng-repeat="resource in current.resources">
+										<p>{{resource.name}} - {{resource.remaining}}</p>
+									</div>
+
+									<a class="button" ng-click="mine()" 
+													  ng-show="current.resources.length > 0 && current.miningCost <= playerService.money">
+													  	Mine
+									</a>
+									<a class="button" ng-click="abandon()">Abandon</a>
+								</div>
+							</div>
+						</div>
+
+						<div class="item">
+							<div ng-show="playerService.hideFleet">
+								<a class="battleLogCloseButton" ng-click="playerService.hideFleet = false">+</a>
+							</div>
+							<div ng-show="!playerService.hideFleet">
+								<a class="battleLogCloseButton" ng-click="playerService.hideFleet = true">-</a>
+							</div>
+							
+							<p class="name">Fleet</p>
+							<div ng-show="!playerService.hideFleet">
+								<div class="row" ng-repeat="ship in gameService.ships">
+									
+									<div class="triColumn">
+										<p class="shipName">{{ship.name}}</p>
+										<p class="info">Attack: {{ship.attack}}</p>
+										<p class="info">Defense: {{ship.defense}}</p>
+										<p class="price" ng-repeat="item in ship.cost">
+											{{getName(item.id)}} - 
+											<span ng-show="item.name != 'Money'">{{item.price}}</span>
+											<span ng-show="item.name == 'Money'">{{item.price | currency}}</span>
+										</p>
+									</div>
+
+									<div class="columnBuy triColumn">
+										<a class="button small" ng-click="buy(ship.id, 1)">1</a>
+										<a class="button small" ng-click="buy(ship.id, 10)">10</a>
+										<a class="button small" ng-click="buy(ship.id, 100)">100</a>
+										<a class="button small" ng-click="buy(ship.id, 1000)">1000</a>
+									</div>
+
+									<div class="columnCount triColumn">
+										<p>{{getCount(ship.id) | number}}</p>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+						<div class="item"
+							 ng-show="playerService.totalResearch > 0">
+							<div ng-show="playerService.hideResearch">
+								<a class="battleLogCloseButton" ng-click="playerService.hideResearch = false">+</a>
+							</div>
+							<div ng-show="!playerService.hideResearch">
+								<a class="battleLogCloseButton" ng-click="playerService.hideResearch = true">-</a>
+							</div>
+							
+							<p class="name">Research</p>
+							<div ng-show="!playerService.hideResearch">
+								<p>Research Remaining: {{ getResearch() | number}}</p>
+								<p>Rate: {{ getResearchPerSec() | number}}/sec</p>
+								<br /><br />
+
+								<div class="item"
+									 ng-repeat="perk in availablePerks()"
+									 ng-class="{disabled: !canBuyPerk(perk), enabled: canBuyPerk(perk), hover: canBuyPerk(perk) && hoverPerk, alreadyBought: alreadyBought(perk.id)}"
+									 ng-click="buyPerk(perk)"
+									 ng-mouseenter="hoverPerk = true"
+									 ng-mouseleave="hoverPerk = false">
+									<p class="name">{{perk.name}}</p>
+									<br/ >
+									<p class="info">Research: {{perk.price | number}}</p>
+									<br /><br />
+									<p class="info">{{perk.description}}</p>
+									<br /><br />
+									<p class="info">Increases <span class="bold">{{translateProperty(perk.property) | uppercase}}</span> 
+									<span ng-show="!perk.skipEffect">by <span class="bold">{{perk.effect * 100}}</span>%</p></span>
+								</div>
+							</div>
+						</div>
+
+						<div class="item">
+							<p class="name">The Final Frontier</p>
+							<div class="spaceScroller" ng-init="initPlanets()">
+								<div class="planet" id="{{planet.id}}"
+									 ng-repeat="planet in planets"
+									 ng-class="{hover: hoverPlanet}"
+									 ng-mouseenter="hoverPlanet = true"
+									 ng-mouseleave="hoverPlanet = false"
+									 ng-click="selectPlanet(planet)">
+									<p class="name white">{{getPlanet(planet.id).name}}</p>
+									<img ng-src="images/space/{{getPlanetImage(planet)}}" />
+								</div>
+							</div>
+						</div>
+
+						<div class="item"
+							 ng-show="battleLog.length > 0">
+							<a class="battleLogCloseButton" ng-click="battleLog = []">X</a>
+							<p class="name" ng-show="playerService.ships.length > 0">Victory</p>
+							<p class="name" ng-show="playerService.ships.length == 0">Defeat</p>
+							<div class="battleRow" ng-class="{ enemyAttack: !log.isPlayer }"
+							   ng-repeat="log in battleLog track by $index">
+							   	<div ng-show="log.remaining.length == 0">
+							   		<p class="info">{{log.name}} destroyed remaining forces.</p>
+							   	</div>
+							   	<div ng-show="log.remaining.length > 0">
+							   		<p class="info">{{log.name}} destroyed {{log.damage | number}} ships.</p><br />
+							   		<p class="info">{{log.against}} fleet remaining: {{log.remaining}}</p>
+							   	</div>
+							</div>
+						</div>
+
+						<div class="item"
+							 ng-show="selectedPlanet != null && !selectedPlanet.cannotSelect">
+							 <a class="battleLogCloseButton" ng-click="selectedPlanet = null">X</a>
+							<p class="name">{{selectedPlanet.name}}</p>
+							<br /><br />
+
+							<p title="Allows you to purchased one of each building."
+							   ng-show="isAppeased() && !isConquered()">
+								{{selectedPlanet.name}} is appeased.
+							</p>
+
+							<div ng-show="canBuildBuildings()">
+								<p ng-show="cacheService.planetBoost(selectedPlanet.id).mps > 0">
+									Adds: {{cacheService.planetBoost(selectedPlanet.id).mps | currency}}/sec
+								</p>
+								<p ng-show="cacheService.planetBoost(selectedPlanet.id).resources > 0">
+									Adds: {{cacheService.planetBoost(selectedPlanet.id).resources}} resources/sec
+								</p>
+								<p ng-show="cacheService.planetBoost(selectedPlanet.id).research > 0">
+									Adds: {{cacheService.planetBoost(selectedPlanet.id).research}} research/sec
+								</p>
+								<br /><br />
+							</div>
+
+							<div class="row"
+								 ng-repeat="building in gameService.buildings"
+								 ng-show="canBuildBuildings()">
+								<div class="triColumn">
+									<p title="{{building.description}}">{{building.name}}</p>
+								</div>
+								<div class="triColumn">
+									<p class="price" ng-repeat="item in building.cost">
+										{{getName(item.id)}} - 
+										<span ng-show="item.name != 'Money'">{{item.price}}</span>
+										<span ng-show="item.name == 'Money'">{{item.price | currency}}</span>
+									</p>
+								</div>
+								<div class="triColumn columnCount">
+									<p class="info">{{getLevel(building)}}<p>
+									<a class="button small"
+									   ng-click="buyBuilding(building)"
+									   ng-show="!isMaxLevel(building)">
+									   	Buy
+									   </a>
+								</div>
+							</div>
+
+							<div class="battleOverview">
+								<span ng-show="!isConquered()">
+									<div class="row"
+										 ng-repeat="enemy in selectedPlanet.enemies">
+										 {{getShipName(enemy.id)}} - {{enemy.count | number}}
+									</div>
+									<a class="button" 
+									   ng-click="attack()"
+									   ng-show="playerService.ships.length > 0">
+										Attack
+									</a>
+								</span>
+								<a class="button large" 
+								   ng-click="appease()"
+								   ng-show="playerService.ships.length > 0 && canAppease()">
+									Appease ({{cachedAppeasementCost}} Gold)
+								</a>
+							</div>
+						</div>
+					</div>
+				</script>
+
+				<script type="text/ng-template" id="knowledge.html">
+					<div class="content center">
+						<div>
+							<section>
+								<p>Available Knowledge: {{knowledge()}}</p>
+							</section>
+						</div>
+						
+						<div class="item">
+							<p class="name">VC Funding - {{playerService.vcFunding * 1000 | currency}}</p>
+							<div class="info">
+								<p>Every BK spent on VC Funding will provide your next (and current) company with $1,000.</P>
+								<a class="button" ng-click="buyVcFunding(1)">1 VC - 1 BK</a>
+								<a class="button" ng-click="buyVcFunding(10)">10 VC - 10 BK</a>					
+								<a class="button" ng-click="buyVcFunding(knowledge())" ng-show="knowledge() > 10">{{knowledge()}} VC - {{knowledge()}} BK</a>
+							</div>
+						</div>
+						<div class="item">
+							<p class="name">Business Connections</p>
+							<p class="name">Current: {{playerService.businessConnections | number}} - {{getBcBoost() * 100 | number:2}}%</p>
+							<p class="name">Current Max: {{getMaxBcBoost() * 100 | number:2}}%</p>
+							<br />
+							<div class="info">
+								<p>Every Business Connections will provide you with a permanent boost to your MPS.  The boost % degrades with each new connection for a max MPS boost of 100%.  Business Connections cost 2 BK.</P>
+								<a class="button" ng-click="buyBusinessConnections(1)">1 BC - 2 BK</a>
+								<a class="button" ng-click="buyBusinessConnections(10)">10 BC - 20 BK</a>					
+								<a class="button" ng-click="buyBusinessConnections(knowledge() / 2)" ng-show="knowledge() > 20">{{knowledge() / 2}} BC - {{knowledge()}} BK</a>
+							</div>
+						</div>
+
+						<div class="knowledgeItems">
+							<div class="item"
+								 ng-class="{disabled: !canBuy(item.id), enabled: canBuy(item.id), hover: canBuy(item.id) && hoverK, alreadyBought: alreadyBought(item.id)}" 
+								 ng-repeat="item in items"
+								 ng-click="buy(item.id)"
+								 ng-mouseenter="hoverK = true"
+								 ng-mouseleave="hoverK = false"
+								 ng-show="canShow(item.id)">
+								<p class="name">{{item.item.name}}</p>
+								<div class="info">
+									<p>{{item.description}}</p>
+									<p>{{item.price}} Knowledge</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</script>
+				
+				<script type="text/ng-template" id="menu.html">
+					<div class="content center border">
+						<section>
+							<p>Set the name of your new corporation!</p>
+							<input type="text" ng-model="playerService.companyName" />
+						</section>
+						<section>
+							<p>FPS - Higher numbers will make the game smoother but may lag older systems.</p>
+							<input type="number" ng-model="playerService.fps" min="1" max="1000" step="any" />
+						</section>
+						<section>
+							<p>Hide upgrades you already bought:</p>
+							<input type="checkbox" ng-model="playerService.hideBoughtUpgrades" />
+						</section>
+						<section>
+							<p>Hide number popups when doing business opportunities</p>
+							<input type="checkbox" ng-model="playerService.hideNumberPops" />
+						</section>
+						<section>
+							<p>The game auto-saves every 30 seconds, but in case you are in a hurry, use this:</p>
+							<a class="button" ng-click="saveGame()">Save Game</a>
+						</section>
+						<section>
+							<p>Backup your save or transfer it to a new computer (THIS FEATURE IS STILL IN BETA):</p>
+							<a class="button" ng-click="import()">Import</a>
+							<a class="button" ng-click="export()">Export</a>
+						</section>
+						<section>
+							<p>Lose control of your current company, but gain Business Knowledge based on how much total money your current business made.  This can be used to unlock new items and upgrades for your next company!</p>
+							<p>You will earn {{potentialKp()}} BK by starting a new business.</p>
+							<a class="button" ng-click="prestige()">Start New Business</a>
+						</section>
+						<section>
+							<p>This will hard reset your game so you will lose your current save file.  Refresh after you press it.</p>
+							<a class="button" ng-click="resetGame()">Reset Game</a>
+						</section>
+
+						<section><h2 class="underline">About</h2></section>
+						<section>
+							<p class="info">
+								Hi, my name is <a href='https://www.linkedin.com/profile/view?id=150901976' target='_blank'>Eric</a> and I made this game.  It is inspired by my favorite idle game <a href='http://orteil.dashnet.org/cookieclicker/'>Cookie Clicker</a> (you should play it if you have not already!).
+								It is <a href = 'https://github.com/EricFreeman/AngularIdleGame' target='_blank'>open source</a> so feel free to fork it, submit some pull requests, create issues, or none of the above.
+								If you want to send me suggestions, fan mail, hate mail, spam mail, or all of the above, use <a href="mailto:eric@giantshaft.com">eric@giantshaft.com</a>.
+							</p>
+							<br />
+							<p class="info">
+								Icons were provided to this project for free from <a href="http://icons8.com/" target='_blank'>Icons8</a>.
+							</p>
+						</section>
+						<section><h2 class="underline">Tips</h2></section>
+						<section>
+							<ul>
+								<li>Starting a new business gives you 1 Business Knowledge point per $1 billion of total money made by current business.</li>
+								<li>The cheapest item on your first prestige will cost you 10 BK so you should probably wait until you have over 100 to make starting a new business worthwhile.</li>
+								<li>If there is anything you want to see in future versions of this game, feel free to <a href="mailto:eric@giantshaft.com">shoot me an email</a>.</li>
+							</ul>
+						</section>
+						<section><h2 class="underline">Updates</h2></section>
+						<section ng-repeat="update in updates">
+							<p class="name">{{update.title}}</p>
+							<p class="info">{{update.description}}</p>
+						</section>
+					</div>
+				</script>
+			</div>
+			<div class="rightAd">
+				<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+				<!-- Idle Game Right Side -->
+				<ins class="adsbygoogle"
+				     style="display:inline-block;width:120px;height:600px"
+				     data-ad-client="ca-pub-2046389339559087"
+				     data-ad-slot="2827205531"></ins>
+				<script>
+				(adsbygoogle = window.adsbygoogle || []).push({});
+				</script>
+			</div>
+			<div class="bottomAd center">
+				<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+				<!-- Idle Game Bottom Skinnier -->
+				<ins class="adsbygoogle"
+				     style="display:inline-block;width:468px;height:60px"
+				     data-ad-client="ca-pub-2046389339559087"
+				     data-ad-slot="1071270732"></ins>
+				<script>
+				(adsbygoogle = window.adsbygoogle || []).push({});
+				</script>
+			</div>
+
+			<div class="bottomLinks">
+				<a href="https://www.facebook.com/GiantShaftEnterprises" target="_blank">
+					<img src="images/icons/facebook.png">
+				</a>
+				<a href="http://ericfreemanmakesavideogame.tumblr.com/" target="_blank">
+					<img src="images/icons/tumblr.png">
+				</a>
+				<a href="https://github.com/EricFreeman/AngularIdleGame" target="_blank">
+					<img src="images/icons/github.png">
+				</a>
+			</div>
+
+			<div ng-controller="OverlayController">
+				<div ng-repeat="message in messages"
+					 class="messageStart messageBottom center">
+					<p>{{message.text}}</p>
+				</div>
+
+				<p ng-repeat="s in spawn"
+					 class="numberPop">
+					{{s.data.text | currency}}
+				</p>
+
+				<div ng-show="showTutorial()"
+					 ng-init="tutorialInit()"
+					 class="tutorial">
+					<div>
+						<p>{{tutorialText}}</p>
+						<p>{{progress}}</p>
+					</div>
+					<img src="images/arrow.png" />
+				</div>
+			</div>
+
+			<div ng-controller="HelpController">
+				<div id="helpClosed"
+					 ng-show="!displayHelp">
+					<a class="helpLink"><img src="images/icons/help.png" ng-click="displayHelp = true" /></a>
+				</div>
+
+				<div id="helpBalloon"
+					 ng-show="displayHelp" 
+					 class="noSelect">
+
+					<div class="closeClippy helpLink" ng-click="closeHelp()">x</div>
+
+					<img src="images/clippyTip.png" id="clippyTip" />
+
+					<img id="clippy"
+						 src="images/clippy.png"
+						 ng-click="displayTopics = !displayTopics"/>
+
+					<div ng-show="selectedTopic == null">
+						<span class="bold">What can I help you with today?</span>
+						<br /><br />
+						<ul>
+							<li ng-repeat="topic in topics">
+								<a class="helpLink" 
+								   ng-click="selectTopic(topic)">{{topic.name}}</a>
+							</li>
+						</ul>
+					</div>
+
+					<div ng-show="selectedTopic != null && selectedQuestion == null">
+						<span class="bold">{{selectedTopic.name}}</span>
+						<br /><br />
+						<ul>
+							<li ng-repeat="question in selectedTopic.questions">
+								<a class="helpLink" ng-click="selectQuestion(question)">{{question.name}}</a>
+							</li>
+						</ul>
+						<br/>
+						<a class="helpLink" ng-click="selectTopic()">< Back</a>
+					</div>
+
+					<div ng-show="selectedTopic != null && selectedQuestion != null">
+						<span class="bold">{{selectedQuestion.name}}</span>
+						<br /><br />
+						<span>{{selectedQuestion.answer}}</span>
+						<br /><br />
+						<a class="helpLink" ng-click="selectQuestion()">< Back</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
